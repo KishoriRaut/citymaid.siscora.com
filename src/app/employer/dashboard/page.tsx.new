@@ -1,0 +1,97 @@
+'use client';
+
+import { useAuth } from '@/context/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Link from 'next/link';
+import { 
+  BriefcaseIcon, 
+  UsersIcon, 
+  DocumentCheckIcon, 
+  ClockIcon,
+  ArrowUpRightIcon,
+  ArrowDownRightIcon,
+  BellIcon,
+  CalendarIcon,
+  UserGroupIcon
+} from '@heroicons/react/24/outline';
+
+const stats = [
+  { id: 1, name: 'Active Jobs', value: '3', icon: BriefcaseIcon, change: '+2.5%', changeType: 'increase', link: '/employer/my-jobs' },
+  { id: 2, name: 'New Applications', value: '12', icon: DocumentCheckIcon, change: '+30.1%', changeType: 'increase', link: '/employer/my-jobs' },
+  { id: 3, name: 'Shortlisted', value: '5', icon: UsersIcon, change: '+1.8%', changeType: 'decrease', link: '/employer/my-jobs' },
+  { id: 4, name: 'Upcoming Interviews', value: '2', icon: CalendarIcon, change: '+0.5%', changeType: 'increase', link: '#' },
+];
+
+const recentActivity = [
+  { id: 1, type: 'application', description: 'Maria G. applied for Housekeeper position', time: '2h ago', read: false },
+  { id: 2, type: 'message', description: 'New message from Sarah M.', time: '5h ago', read: true },
+  { id: 3, type: 'payment', description: 'Payment received for Premium Membership', time: '1d ago', read: true },
+  { id: 4, type: 'job', description: 'Your job post has been approved', time: '2d ago', read: true },
+];
+
+const quickActions = [
+  { name: 'Post a New Job', href: '/employer/post-job', icon: DocumentCheckIcon, iconBackground: 'bg-blue-100', iconForeground: 'text-blue-600' },
+  { name: 'Browse Workers', href: '/employer/browse-workers', icon: UserGroupIcon, iconBackground: 'bg-green-100', iconForeground: 'text-green-600' },
+  { name: 'View Applications', href: '/employer/my-jobs', icon: UsersIcon, iconBackground: 'bg-purple-100', iconForeground: 'text-purple-600' },
+  { name: 'View Analytics', href: '/employer/stats', icon: ChartBarIcon, iconBackground: 'bg-yellow-100', iconForeground: 'text-yellow-600' },
+];
+
+function ChartBarIcon(props: React.ComponentProps<'svg'>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+      />
+    </svg>
+  );
+}
+
+export default function EmployerDashboard() {
+  const { user, signOut } = useAuth();
+  const [activeTab, setActiveTab] = React.useState('dashboard');
+
+  return (
+    <ProtectedRoute allowedRoles={['employer']}>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
+        {/* Sidebar */}
+        <div className="hidden md:flex md:flex-shrink-0 bg-white shadow-xl">
+          <div className="w-64 flex flex-col border-r border-gray-100">
+            {/* Sidebar content */}
+            <div className="h-20 flex items-center px-6 border-b border-gray-100">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                  <span className="text-white font-bold">CM</span>
+                </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                  CityMaid
+                </h1>
+              </div>
+            </div>
+            
+            {/* Rest of your component JSX */}
+            {/* ... */}
+            
+          </div>
+        </div>
+        
+        {/* Main content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Main content here */}
+          <div className="p-6">
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            {/* Your dashboard content */}
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}
