@@ -26,18 +26,113 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Check active sessions and set the user
+    const initializeAuth = async () => {
+      setLoading(true);
+      try {
+        // First, try to get the current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        // If there's an error, clear the session
+        if (sessionError) {
+          console.log('Session error, signing out:', sessionError);
+          await supabase.auth.signOut();
+          setUser(null);
+          setRole(null);
+          setLoading(false);
+          return;
+        }
+        
+        if (session?.user) {
+          setUser(session.user);
+          
+          // First, try to get the user's role
+          try {
+            // Try to fetch the profile
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+
+            if (error) {
+              console.log('Profile fetch error, attempting to create profile...');
+              
+              // Try to create the profiles table if it doesn't exist
+              try {
+                await supabase.rpc('create_profiles_table_if_not_exists');
+              } catch (tableError) {
+                console.log('Could not create profiles table, will use default role');
+              }
+              
+              // Set a default role
+              setRole('employer');
+              
+              // Try to create the profile in the background
+              (async () => {
+                try {
+                  const { error: insertError } = await supabase
+                    .from('profiles')
+                    .insert([
+                      { 
+                        id: session.user.id, 
+                        email: session.user.email,
+                        role: 'employer',
+                        created_at: new Date().toISOString()
+                      }
+                    ]);
+                  
+                  if (insertError) {
+                    console.log('Background profile creation failed:', insertError);
+                  } else {
+                    console.log('Background profile creation successful');
+                  }
+                } catch (e) {
+                  console.log('Background profile creation error:', e);
+                }
+              })();
+              
+            } else {
+              // If we got the profile, set the role
+              setRole(data?.role || 'employer');
+            }
+          } catch (err) {
+            console.error('Error in profile handling:', err);
+            // Default to employer role if anything goes wrong
+            setRole('employer');
+          }
+        } else {
+          setUser(null);
+          setRole(null);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setUser(null);
+        setRole(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Initialize auth state
+    initializeAuth();
+    
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setLoading(true);
         if (session?.user) {
           setUser(session.user);
-          // Fetch user role from profiles table
-          const { data } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-          setRole(data?.role || null);
+          try {
+            const { data } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+            setRole(data?.role || 'employer');
+          } catch (error) {
+            console.error('Error fetching profile:', error);
+            setRole('employer');
+          }
         } else {
           setUser(null);
           setRole(null);

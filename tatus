@@ -1,0 +1,4 @@
+[33m8be2b47[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Add profiles table migration
+[33mf5fd065[m fix: update auth context and database triggers for signup flow
+[33mf2ee94c[m refactor: update authentication UI and components
+[33m1345125[m Initial commit with complete project structure
