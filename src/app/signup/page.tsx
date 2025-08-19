@@ -44,9 +44,22 @@ export default function SignUpPage() {
     
     try {
       localStorage.setItem('signup_role', role);
-      await signUpWithEmail(email, password, fullName);
+      const result = await signUpWithEmail(email, password, fullName);
+      
+      if (!result) {
+        throw new Error('No response from server');
+      }
+      
+      if (result.session) {
+        // Successfully signed up and got a session
+        router.push(role === 'maid' ? '/maid/dashboard' : '/employer/dashboard');
+      } else {
+        // Email confirmation required
+        setError('Please check your email to verify your account');
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to create an account');
+      console.error('Signup error:', err);
+      setError(err.message || 'Failed to create an account. Please try again.');
     } finally {
       setIsLoading(false);
     }

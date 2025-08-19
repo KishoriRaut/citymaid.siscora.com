@@ -4,9 +4,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import AuthLayout from '@/components/auth/AuthLayout';
+
 // Google icon SVG
 const GoogleIcon = () => (
-  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+  <svg className="h-4 w-4" viewBox="0 0 24 24">
     <path
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
       fill="#4285F4"
@@ -29,17 +34,11 @@ const GoogleIcon = () => (
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { 
-    signInWithGoogle, 
-    signInWithEmail, 
-    user, 
-    role, 
-    loading: authLoading 
-  } = useAuth();
-  
+  const { signInWithGoogle, signInWithEmail, user, role, loading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -90,123 +89,109 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Welcome back
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to access your account
-          </p>
+    <AuthLayout 
+      title="Welcome back" 
+      subtitle="Sign in to your account"
+    >
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-red-50 border-l-4 border-red-500">
+          <p className="text-sm text-red-700">{error}</p>
         </div>
+      )}
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
+      <Button
+        variant="outline"
+        size="lg"
+        className="w-full mb-6"
+        onClick={handleGoogleSignIn}
+        disabled={isLoading}
+        leftIcon={<GoogleIcon />}
+      >
+        Continue with Google
+      </Button>
 
-        {/* Google Sign In */}
-        <div>
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-            className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-          >
-            <GoogleIcon />
-            {isLoading ? 'Signing in...' : 'Continue with Google'}
-          </button>
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200"></div>
         </div>
-
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">
-              Or sign in with email
-            </span>
-          </div>
-        </div>
-
-        {/* Email Sign In Form */}
-        <form className="mt-6 space-y-4" onSubmit={handleEmailSignIn}>
-          <div>
-            <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              id="email-address"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="text-sm">
-                <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
-
-        <div className="text-center text-sm">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <Link 
-              href="/signup" 
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
-            >
-              Sign up
-            </Link>
-          </p>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white text-gray-500">
+            Or continue with email
+          </span>
         </div>
       </div>
-    </div>
+
+      <form className="space-y-4" onSubmit={handleEmailSignIn}>
+        <Input
+          label="Email address"
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          leftIcon={<Mail className="h-4 w-4 text-gray-400" />}
+        />
+
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <Link 
+              href="/forgot-password" 
+              className="text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            leftIcon={<Lock className="h-4 w-4 text-gray-400" />}
+            rightIcon={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            }
+          />
+        </div>
+
+        <Button 
+          type="submit" 
+          className="w-full mt-6"
+          size="lg"
+          isLoading={isLoading}
+        >
+          Sign in
+        </Button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-gray-600">
+        Don't have an account?{' '}
+        <Link 
+          href="/signup" 
+          className="font-medium text-blue-600 hover:text-blue-500"
+        >
+          Sign up
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

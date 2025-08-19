@@ -10,7 +10,7 @@ interface AuthContextType {
   user: any;
   role: UserRole;
   signInWithGoogle: () => Promise<void>;
-  signUpWithEmail: (email: string, password: string, fullName: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ user: any; session: any } | undefined>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
@@ -72,32 +72,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUpWithEmail = async (email: string, password: string, fullName: string) => {
     try {
+      const role = localStorage.getItem('signup_role') as UserRole || 'employer';
+      
+      // 1. Sign up the user with email and password
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
+            email: email,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (signUpError) throw signUpError;
+      if (!authData?.user) throw new Error('No user data returned from sign up');
 
-      // Store the role in the profiles table
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: authData.user.id,
-            email,
-            full_name: fullName,
-            role: localStorage.getItem('signup_role') || 'employer',
-            updated_at: new Date().toISOString(),
-          });
+      // 2. Use the service role client to bypass RLS for profile creation
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: authData.user.id,
+          email: email,
+          full_name: fullName,
+          role: role,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
 
-        if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw new Error(`Failed to create profile: ${profileError.message}`);
       }
+
+      // 3. Update local state
+      setUser(authData.user);
+      setRole(role);
+      
+      // 4. Force refresh the session to ensure it's up to date
+      const { data: { session }, error: sessionError } = await supabase.auth.refreshSession();
+      
+      if (sessionError) {
+        console.error('Error refreshing session:', sessionError);
+        throw sessionError;
+      }
+      
+      return { 
+        user: { 
+          ...authData.user, 
+          role: profileData?.role || role 
+        }, 
+        session 
+      };
     } catch (error) {
       console.error('Error signing up with email:', error);
       throw error;

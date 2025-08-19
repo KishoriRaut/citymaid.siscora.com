@@ -13,8 +13,8 @@ CREATE TABLE public.profiles (
   avatar_url TEXT,
   phone_number TEXT,
   address JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Create indexes
@@ -38,10 +38,11 @@ CREATE POLICY "Users can update their own profile." ON public.profiles
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role, created_at, updated_at)
+  INSERT INTO public.profiles (id, email, full_name, role, created_at, updated_at)
   VALUES (
     NEW.id, 
     NEW.email,
+    NEW.raw_user_meta_data->>'full_name',
     COALESCE(
       (SELECT role FROM public.profiles WHERE id = NEW.id),
       'employer'::TEXT
@@ -51,6 +52,7 @@ BEGIN
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
+    full_name = EXCLUDED.full_name,
     updated_at = timezone('utc'::text, now());
   RETURN NEW;
 END;
