@@ -9,6 +9,7 @@ import {
   DocumentCheckIcon, 
   ClockIcon,
   ArrowUpRightIcon,
+  ArrowDownRightIcon,
   BellIcon,
   CalendarIcon,
   UserGroupIcon
@@ -59,24 +60,27 @@ export default function EmployerDashboard() {
 
   return (
     <ProtectedRoute allowedRoles={['employer']}>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
         {/* Sidebar */}
         <div className="hidden md:flex md:flex-shrink-0">
-          <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+          <div className="w-64 bg-white/80 backdrop-blur border-r border-gray-200 flex flex-col">
             <div className="h-16 flex items-center px-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase">Quick Actions</h2>
             </div>
-            <nav className="flex-1 p-4 space-y-1">
+            <nav className="flex-1 p-4 space-y-2">
               {quickActions.map((action) => (
                 <Link
                   key={action.name}
                   href={action.href}
-                  className="group flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  className="group flex items-center px-4 py-3 text-sm font-medium rounded-xl border border-transparent hover:border-gray-200 hover:bg-gray-50/80 hover:text-gray-900 transition-all duration-200"
                 >
-                  <span className={`mr-3 flex-shrink-0 h-6 w-6 ${action.iconForeground}`}>
-                    <action.icon className="h-6 w-6" aria-hidden="true" />
+                  <span className={`mr-3 flex-shrink-0 h-9 w-9 rounded-lg flex items-center justify-center ${action.iconBackground} ${action.iconForeground}`}>
+                    <action.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  {action.name}
+                  <span className="truncate">{action.name}</span>
+                  <svg className="ml-auto h-4 w-4 text-gray-300 group-hover:text-gray-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               ))}
             </nav>
@@ -89,7 +93,7 @@ export default function EmployerDashboard() {
           {/* Header */}
           <div className="md:flex md:items-center md:justify-between mb-8">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                 Welcome back, {user?.email?.split('@')[0] || 'Employer'}
               </h1>
               <p className="mt-1 text-sm text-gray-500">
@@ -101,7 +105,7 @@ export default function EmployerDashboard() {
               <button
                 type="button"
                 onClick={signOut}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Sign Out
               </button>
@@ -112,32 +116,29 @@ export default function EmployerDashboard() {
           <div className="mt-8">
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {stats.map((stat) => (
-                <div key={stat.id} className="bg-white overflow-hidden shadow rounded-lg">
+                <div key={stat.id} className="bg-white/80 backdrop-blur border border-gray-200 overflow-hidden shadow-sm rounded-2xl hover:shadow-md transition-shadow">
                   <Link href={stat.link} className="block">
                     <div className="p-5">
-                      <div className="flex items-center">
+                      <div className="flex items-start">
                         <div className="flex-shrink-0">
-                          <stat.icon className="h-6 w-6 text-gray-400" aria-hidden="true" />
+                          <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                            <stat.icon className="h-5 w-5 text-gray-500" aria-hidden="true" />
+                          </div>
                         </div>
-                        <div className="ml-5 w-0 flex-1">
+                        <div className="ml-4 w-0 flex-1">
                           <dl>
                             <dt className="text-sm font-medium text-gray-500 truncate">{stat.name}</dt>
-                            <dd className="flex items-baseline">
-                              <div className="text-2xl font-semibold text-gray-900">{stat.value}</div>
-                              <div
-                                className={`ml-2 flex items-baseline text-sm font-semibold ${
-                                  stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                                }`}
-                              >
-                                {stat.changeType === 'increase' ? (
-                                  <ArrowUpRightIcon className="self-center flex-shrink-0 h-4 w-4 text-green-500" />
-                                ) : (
-                                  <ArrowUpRightIcon className="self-center flex-shrink-0 h-4 w-4 text-red-500 transform rotate-90" />
-                                )}
-                                <span className="sr-only">
-                                  {stat.changeType === 'increase' ? 'Increased' : 'Decreased'} by
+                            <dd className="mt-1">
+                              <div className="text-3xl font-semibold text-gray-900">{stat.value}</div>
+                              <div className="mt-2">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stat.changeType === 'increase' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                  {stat.changeType === 'increase' ? (
+                                    <ArrowUpRightIcon className="-ml-0.5 mr-1 h-3 w-3 text-green-600" aria-hidden="true" />
+                                  ) : (
+                                    <ArrowDownRightIcon className="-ml-0.5 mr-1 h-3 w-3 text-red-600" aria-hidden="true" />
+                                  )}
+                                  {stat.change}
                                 </span>
-                                {stat.change}
                               </div>
                             </dd>
                           </dl>
@@ -157,10 +158,10 @@ export default function EmployerDashboard() {
           <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Recent Activity */}
             <div className="lg:col-span-2">
-              <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="bg-white/80 backdrop-blur border border-gray-200 shadow-sm rounded-2xl overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
+                    <h2 className="text-base font-semibold text-gray-900">Recent Activity</h2>
                     <Link href="/employer/notifications" className="text-sm font-medium text-blue-600 hover:text-blue-500">
                       View all
                     </Link>
@@ -218,9 +219,9 @@ export default function EmployerDashboard() {
 
             {/* Upcoming Tasks */}
             <div>
-              <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="bg-white/80 backdrop-blur border border-gray-200 shadow-sm rounded-2xl overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">Upcoming Tasks</h2>
+                  <h2 className="text-base font-semibold text-gray-900 mb-4">Upcoming Tasks</h2>
                   <div className="space-y-4">
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
@@ -259,7 +260,7 @@ export default function EmployerDashboard() {
                   <div className="mt-6">
                     <Link
                       href="#"
-                      className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      className="w-full flex justify-center items-center px-4 py-2 border border-gray-200 shadow-sm text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50"
                     >
                       View all tasks
                     </Link>
@@ -268,17 +269,17 @@ export default function EmployerDashboard() {
               </div>
 
               {/* Quick Stats */}
-              <div className="mt-6 bg-white shadow rounded-lg overflow-hidden">
+              <div className="mt-6 bg-white/80 backdrop-blur border border-gray-200 shadow-sm rounded-2xl overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Stats</h2>
+                  <h2 className="text-base font-semibold text-gray-900 mb-4">Quick Stats</h2>
                   <div className="space-y-4">
                     <div>
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium text-gray-900">Profile Completion</p>
                         <p className="text-sm font-medium text-gray-900">85%</p>
                       </div>
-                      <div className="mt-1 w-full bg-gray-200 rounded-full h-2.5">
-                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '85%' }}></div>
+                      <div className="mt-1.5 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-500 h-2.5 w-[85%]"></div>
                       </div>
                     </div>
                     <div>
@@ -286,8 +287,8 @@ export default function EmployerDashboard() {
                         <p className="text-sm font-medium text-gray-900">Active Job Posts</p>
                         <p className="text-sm font-medium text-gray-900">3/5</p>
                       </div>
-                      <div className="mt-1 w-full bg-gray-200 rounded-full h-2.5">
-                        <div className="bg-green-600 h-2.5 rounded-full" style={{ width: '60%' }}></div>
+                      <div className="mt-1.5 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div className="bg-gradient-to-r from-green-600 to-emerald-500 h-2.5 w-[60%]"></div>
                       </div>
                     </div>
                     <div>
@@ -295,8 +296,8 @@ export default function EmployerDashboard() {
                         <p className="text-sm font-medium text-gray-900">Response Rate</p>
                         <p className="text-sm font-medium text-gray-900">92%</p>
                       </div>
-                      <div className="mt-1 w-full bg-gray-200 rounded-full h-2.5">
-                        <div className="bg-purple-600 h-2.5 rounded-full" style={{ width: '92%' }}></div>
+                      <div className="mt-1.5 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div className="bg-gradient-to-r from-purple-600 to-fuchsia-500 h-2.5 w-[92%]"></div>
                       </div>
                     </div>
                   </div>

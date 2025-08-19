@@ -55,42 +55,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .single();
 
             if (error) {
-              console.log('Profile fetch error, attempting to create profile...');
-              
-              // Try to create the profiles table if it doesn't exist
-              try {
-                await supabase.rpc('create_profiles_table_if_not_exists');
-              } catch (tableError) {
-                console.log('Could not create profiles table, will use default role');
-              }
-              
-              // Set a default role
+              console.log('Profile fetch error, defaulting role to employer (suppressing background creation in dev)...');
+              // In dev, avoid background table RPC and insert attempts to prevent 404/401 noise
               setRole('employer');
-              
-              // Try to create the profile in the background
-              (async () => {
-                try {
-                  const { error: insertError } = await supabase
-                    .from('profiles')
-                    .insert([
-                      { 
-                        id: session.user.id, 
-                        email: session.user.email,
-                        role: 'employer',
-                        created_at: new Date().toISOString()
-                      }
-                    ]);
-                  
-                  if (insertError) {
-                    console.log('Background profile creation failed:', insertError);
-                  } else {
-                    console.log('Background profile creation successful');
-                  }
-                } catch (e) {
-                  console.log('Background profile creation error:', e);
-                }
-              })();
-              
             } else {
               // If we got the profile, set the role
               setRole(data?.role || 'employer');
