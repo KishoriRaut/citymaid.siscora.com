@@ -12,7 +12,8 @@ import {
   ArrowDownRightIcon,
   BellIcon,
   CalendarIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  HomeIcon
 } from '@heroicons/react/24/outline';
 
 const stats = [
@@ -30,6 +31,7 @@ const recentActivity = [
 ];
 
 const quickActions = [
+  { name: 'Dashboard', href: '/employer/dashboard', icon: HomeIcon, iconBackground: 'bg-gray-100', iconForeground: 'text-gray-700' },
   { name: 'Post a New Job', href: '/employer/post-job', icon: DocumentCheckIcon, iconBackground: 'bg-blue-100', iconForeground: 'text-blue-600' },
   { name: 'Browse Workers', href: '/employer/browse-workers', icon: UserGroupIcon, iconBackground: 'bg-green-100', iconForeground: 'text-green-600' },
   { name: 'View Analytics', href: '/employer/stats', icon: ChartBarIcon, iconBackground: 'bg-yellow-100', iconForeground: 'text-yellow-600' },
