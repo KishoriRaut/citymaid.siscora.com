@@ -362,6 +362,19 @@ export default function PostJobPage() {
                   />
                 </div>
 
+                {/* Applications Callout */}
+                <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-semibold text-blue-900">View Applications</h3>
+                      <p className="mt-1 text-sm text-blue-800/80">Track applicants and manage your job posts after publishing.</p>
+                    </div>
+                    <a href="/employer/my-jobs" className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
+                      Go to Applications
+                    </a>
+                  </div>
+                </div>
+
                 {/* Form Buttons */}
                 <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 border-t border-gray-100">
                   <button

@@ -32,7 +32,6 @@ const recentActivity = [
 const quickActions = [
   { name: 'Post a New Job', href: '/employer/post-job', icon: DocumentCheckIcon, iconBackground: 'bg-blue-100', iconForeground: 'text-blue-600' },
   { name: 'Browse Workers', href: '/employer/browse-workers', icon: UserGroupIcon, iconBackground: 'bg-green-100', iconForeground: 'text-green-600' },
-  { name: 'View Applications', href: '/employer/my-jobs', icon: UsersIcon, iconBackground: 'bg-purple-100', iconForeground: 'text-purple-600' },
   { name: 'View Analytics', href: '/employer/stats', icon: ChartBarIcon, iconBackground: 'bg-yellow-100', iconForeground: 'text-yellow-600' },
 ];
 
