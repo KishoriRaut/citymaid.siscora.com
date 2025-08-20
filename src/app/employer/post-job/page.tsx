@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
@@ -50,6 +51,24 @@ const genderPreferences = [
 ];
 
 export default function PostJobPage() {
+  const [selectedWorkType, setSelectedWorkType] = useState('');
+  const [workingHours, setWorkingHours] = useState({
+    startTime: '09:00',
+    endTime: '17:00',
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+  });
+
+  const handleWorkTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedWorkType(e.target.value);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'startTime' | 'endTime') => {
+    setWorkingHours(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+  };
+
   return (
     <ProtectedRoute allowedRoles={['employer']}>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -194,35 +213,95 @@ export default function PostJobPage() {
                 </div>
 
                 {/* Work Type */}
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <BriefcaseIcon className="h-5 w-5 text-blue-500 mr-2" />
-                    <label className="block text-sm font-semibold text-gray-700">Work Type</label>
-                  </div>
-                  <div className="relative">
-                    <select
-                      id="workType"
-                      name="workType"
-                      className="block w-full rounded-xl border border-gray-200 bg-white/60 py-3 pl-10 pr-10 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm sm:leading-6 appearance-none"
-                      defaultValue="full-time"
-                      aria-label="Work type"
-                      title="Work type"
-                    >
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <BriefcaseIcon className="h-5 w-5 text-blue-500 mr-2" />
+                      <label className="block text-sm font-semibold text-gray-700">Work Type</label>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {workTypes.map((type) => (
-                        <option key={type.id} value={type.id}>
-                          {type.label}
-                        </option>
+                        <div key={type.id} className="flex items-center">
+                          <input
+                            id={type.id}
+                            name="workType"
+                            type="radio"
+                            value={type.id}
+                            checked={selectedWorkType === type.id}
+                            onChange={handleWorkTypeChange}
+                            className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <label htmlFor={type.id} className="ml-2 block text-sm text-gray-700">
+                            {type.label}
+                          </label>
+                        </div>
                       ))}
-                    </select>
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <BriefcaseIcon className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <svg className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.24 4.5a.75.75 0 01-1.08 0l-4.24-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                      </svg>
                     </div>
                   </div>
+
+                  {/* Working Hours - Only show when work type is selected */}
+                  {selectedWorkType && (
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-center">
+                        <ClockIcon className="h-5 w-5 text-blue-500 mr-2" />
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Working Hours
+                        </label>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Start Time
+                          </label>
+                          <input
+                            type="time"
+                            value={workingHours.startTime}
+                            onChange={(e) => handleTimeChange(e, 'startTime')}
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            End Time
+                          </label>
+                          <input
+                            type="time"
+                            value={workingHours.endTime}
+                            onChange={(e) => handleTimeChange(e, 'endTime')}
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Working Days
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2">
+                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+                              <div key={day} className="flex items-center">
+                                <input
+                                  id={`day-${day}`}
+                                  type="checkbox"
+                                  checked={workingHours.days.includes(day)}
+                                  onChange={(e) => {
+                                    setWorkingHours(prev => ({
+                                      ...prev,
+                                      days: e.target.checked
+                                        ? [...prev.days, day]
+                                        : prev.days.filter(d => d !== day)
+                                    }));
+                                  }}
+                                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <label htmlFor={`day-${day}`} className="ml-2 block text-sm text-gray-700">
+                                  {day.slice(0, 3)}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Required Skills */}

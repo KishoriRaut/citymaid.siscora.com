@@ -44,19 +44,23 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className={`group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ${
+                        className={`group flex gap-x-3 rounded-md p-3 text-base font-medium leading-6 transition-colors ${
                           item.current
-                            ? 'bg-indigo-700 text-white'
-                            : 'text-indigo-200 hover:bg-indigo-700 hover:text-white'
+                            ? 'bg-indigo-700 text-white shadow-md'
+                            : 'text-indigo-100 hover:bg-indigo-700/80 hover:text-white hover:shadow-sm'
                         }`}
                       >
                         <item.icon
                           className={`h-6 w-6 shrink-0 ${
-                            item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white'
+                            item.current 
+                              ? 'text-white' 
+                              : 'text-indigo-100 group-hover:text-white'
                           }`}
                           aria-hidden="true"
                         />
-                        {item.name}
+                        <span className="relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">
+                          {item.name}
+                        </span>
                       </Link>
                     </li>
                   ))}
