@@ -26,13 +26,22 @@ export default function Header() {
           </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/browse-helpers" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
-              Browse Helpers
+          <nav className="hidden md:flex items-center space-x-4">
+            {/* Show for all users */}
+            <Link 
+              href="/browse/maids" 
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium"
+            >
+              Browse Maids
             </Link>
-            <Link href="/browse-jobs" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+            <Link 
+              href="/browse/jobs" 
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium"
+            >
               Browse Jobs
             </Link>
+            
+            {/* Show dashboard for logged-in users */}
             {user && (
               <Link 
                 href={role === 'maid' ? '/maid/dashboard' : '/employer/dashboard'} 
@@ -43,26 +52,25 @@ export default function Header() {
             )}
           </nav>
           
+          {/* User menu */}
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
+              // Show profile menu for logged-in users
               <div className="relative ml-3">
-                <div>
-                  <button
-                    type="button"
-                    className="flex items-center max-w-xs rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    id="user-menu-button"
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                  >
-                    <span className="sr-only">Open user menu</span>
-                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                      {user.email?.charAt(0).toUpperCase()}
-                    </div>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="flex items-center max-w-xs rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                >
+                  <span className="sr-only">Open user menu</span>
+                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </div>
+                </button>
 
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                    <div className="py-1" role="none">
+                    <div className="py-1">
                       <p className="block px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
                         {user.email}
                       </p>
@@ -76,15 +84,15 @@ export default function Header() {
                       <Link
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          // Add settings navigation here
-                        }}
+                        onClick={() => setIsProfileMenuOpen(false)}
                       >
                         Settings
                       </Link>
                       <button
-                        onClick={handleSignOut}
+                        onClick={() => {
+                          handleSignOut();
+                          setIsProfileMenuOpen(false);
+                        }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Sign out
@@ -94,6 +102,7 @@ export default function Header() {
                 )}
               </div>
             ) : (
+              // Show login/signup for guests
               <>
                 <Link 
                   href="/login" 
@@ -101,9 +110,9 @@ export default function Header() {
                 >
                   Sign In
                 </Link>
-                <Link 
-                  href="/signup" 
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Sign Up
                 </Link>
@@ -135,52 +144,33 @@ export default function Header() {
       {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link 
-              href="/browse-helpers" 
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Browse Helpers
-            </Link>
-            <Link 
-              href="/browse-jobs" 
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Browse Jobs
-            </Link>
-            {user && (
-              <Link
-                href={role === 'maid' ? '/maid/dashboard' : '/employer/dashboard'}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-            )}
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-200">
+          <div className="pt-2 pb-3 space-y-1">
             {user ? (
-              <div className="px-4">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold mr-3">
-                    {user.email?.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{user.email}</p>
-                    <p className="text-xs text-gray-500 capitalize">{role}</p>
-                  </div>
-                </div>
-                <div className="mt-3 space-y-1">
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              </div>
+              <>
+                <Link
+                  href={role === 'maid' ? '/maid/dashboard' : '/employer/dashboard'}
+                  className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="#"
+                  className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Settings
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                >
+                  Sign out
+                </button>
+              </>
             ) : (
               <div className="space-y-1 px-2">
                 <Link 

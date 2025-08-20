@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 type Testimonial = {
   id: number;
@@ -74,6 +77,8 @@ const jobPosts: JobPost[] = [
 ];
 
 export default function Home() {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -81,12 +86,20 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Find Reliable, Verified Domestic Helpers in Nepal</h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto">Fast, Safe, and Stress-Free. Connect with trusted maids, babysitters, caregivers, and more – all background-checked for your peace of mind.</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/maids" className="bg-white text-blue-700 font-semibold py-3 px-8 rounded-lg hover:bg-blue-50 transition duration-300">
-              🔍 Find Maids
+          
+          {/* Action Buttons */}
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link 
+              href="/browse/maids" 
+              className="w-full sm:w-auto bg-white text-blue-700 font-semibold py-3 px-8 rounded-lg hover:bg-blue-50 transition duration-300 flex items-center justify-center gap-2"
+            >
+              👩‍🍳 Browse Maids
             </Link>
-            <Link href="/post-job" className="bg-transparent border-2 border-white text-white font-semibold py-3 px-8 rounded-lg hover:bg-white hover:text-blue-700 transition duration-300">
-              📋 Post a Job
+            <Link 
+              href="/browse/jobs" 
+              className="w-full sm:w-auto bg-blue-700 text-white border-2 border-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-800 transition duration-300 flex items-center justify-center gap-2"
+            >
+              💼 Browse Jobs
             </Link>
           </div>
         </div>
