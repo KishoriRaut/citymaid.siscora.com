@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { 
   BriefcaseIcon, 
   UsersIcon, 
@@ -13,7 +14,9 @@ import {
   BellIcon,
   CalendarIcon,
   UserGroupIcon,
-  HomeIcon
+  HomeIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 
 const stats = [
@@ -30,12 +33,7 @@ const recentActivity = [
   { id: 4, type: 'job', description: 'Your job post has been approved', time: '2d ago', read: true },
 ];
 
-const quickActions = [
-  { name: 'Dashboard', href: '/employer/dashboard', icon: HomeIcon, iconBackground: 'bg-gray-100', iconForeground: 'text-gray-700' },
-  { name: 'Post a New Job', href: '/employer/post-job', icon: DocumentCheckIcon, iconBackground: 'bg-blue-100', iconForeground: 'text-blue-600' },
-  { name: 'Browse Workers', href: '/employer/browse-workers', icon: UserGroupIcon, iconBackground: 'bg-green-100', iconForeground: 'text-green-600' },
-  { name: 'View Analytics', href: '/employer/stats', icon: ChartBarIcon, iconBackground: 'bg-yellow-100', iconForeground: 'text-yellow-600' },
-];
+// Quick actions will be defined inside the component to access the signOut function
 
 function ChartBarIcon(props: React.ComponentProps<'svg'>) {
   return (
@@ -58,98 +56,65 @@ function ChartBarIcon(props: React.ComponentProps<'svg'>) {
 
 export default function EmployerDashboard() {
   const { user, signOut } = useAuth();
+  const [stats, setStats] = useState([
+    { id: 1, name: 'Active Jobs', value: '0', icon: BriefcaseIcon, change: '+0%', changeType: 'increase', link: '/employer/dashboard' },
+    { id: 2, name: 'Unlocked Contacts', value: '0', icon: UserGroupIcon, change: '+0%', changeType: 'increase', link: '/employer/contacts' },
+    { id: 3, name: 'New Messages', value: '0', icon: BellIcon, change: '+0%', changeType: 'increase', link: '#' },
+  ]);
+
+  // Handle sign out from layout
+  useEffect(() => {
+    const handleSignOut = () => signOut();
+    window.addEventListener('signOut', handleSignOut);
+    return () => window.removeEventListener('signOut', handleSignOut);
+  }, [signOut]);
 
   return (
     <ProtectedRoute allowedRoles={['employer']}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
-        {/* Sidebar */}
-        <div className="hidden md:flex md:flex-shrink-0">
-          <div className="w-64 bg-white/80 backdrop-blur border-r border-gray-200 flex flex-col">
-            <div className="h-16 flex items-center px-6 border-b border-gray-200">
-              <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase">Quick Actions</h2>
-            </div>
-            <nav className="flex-1 p-4 space-y-2">
-              {quickActions.map((action) => (
-                <Link
-                  key={action.name}
-                  href={action.href}
-                  className="group flex items-center px-4 py-3 text-sm font-medium rounded-xl border border-transparent hover:border-gray-200 hover:bg-gray-50/80 hover:text-gray-900 transition-all duration-200"
-                >
-                  <span className={`mr-3 flex-shrink-0 h-9 w-9 rounded-lg flex items-center justify-center ${action.iconBackground} ${action.iconForeground}`}>
-                    <action.icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <span className="truncate">{action.name}</span>
-                  <svg className="ml-auto h-4 w-4 text-gray-300 group-hover:text-gray-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              ))}
-            </nav>
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="md:flex md:items-center md:justify-between mb-8">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.email?.split('@')[0] || 'Employer'}</h1>
+            <p className="mt-2 text-gray-600">Here's what's happening with your job postings and contacts today.</p>
           </div>
         </div>
 
-        {/* Main content */}
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="md:flex md:items-center md:justify-between mb-8">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                Welcome back, {user?.email?.split('@')[0] || 'Employer'}
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Here's what's happening with your job postings and applications today.
-              </p>
-            </div>
-            <div className="mt-4 flex md:mt-0 md:ml-4
-            ">
-              <button
-                type="button"
-                onClick={signOut}
-                className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-
           {/* Stats Grid */}
-          <div className="mt-8">
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {stats.map((stat) => (
-                <div key={stat.id} className="bg-white/80 backdrop-blur border border-gray-200 overflow-hidden shadow-sm rounded-2xl hover:shadow-md transition-shadow">
-                  <Link href={stat.link} className="block">
-                    <div className="p-5">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                            <stat.icon className="h-5 w-5 text-gray-500" aria-hidden="true" />
-                          </div>
-                        </div>
-                        <div className="ml-4 w-0 flex-1">
-                          <dl>
-                            <dt className="text-sm font-medium text-gray-500 truncate">{stat.name}</dt>
-                            <dd className="mt-1">
-                              <div className="text-3xl font-semibold text-gray-900">{stat.value}</div>
-                              <div className="mt-2">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stat.changeType === 'increase' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                  {stat.changeType === 'increase' ? (
-                                    <ArrowUpRightIcon className="-ml-0.5 mr-1 h-3 w-3 text-green-600" aria-hidden="true" />
-                                  ) : (
-                                    <ArrowDownRightIcon className="-ml-0.5 mr-1 h-3 w-3 text-red-600" aria-hidden="true" />
-                                  )}
-                                  {stat.change}
-                                </span>
-                              </div>
-                            </dd>
-                          </dl>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {stats.map((stat) => (
+              <Link 
+                key={stat.id} 
+                href={stat.link}
+                className="block bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center">
+                  <div className="p-3 rounded-lg bg-gray-100 text-gray-600">
+                    <stat.icon className="h-6 w-6" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">{stat.name}</p>
+                    <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="mt-4">
+                  <p className={`text-sm ${stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'}`}>
+                    {stat.changeType === 'increase' ? (
+                      <span className="inline-flex items-center">
+                        <ArrowUpRightIcon className="h-4 w-4 mr-1" />
+                        {stat.change}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center">
+                        <ArrowDownRightIcon className="h-4 w-4 mr-1" />
+                        {stat.change}
+                      </span>
+                    )}
+                    <span className="text-gray-500 ml-1">vs last month</span>
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
 
           {/* Stats Section */}
@@ -305,8 +270,6 @@ export default function EmployerDashboard() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
           </div>
         </div>
       </div>
