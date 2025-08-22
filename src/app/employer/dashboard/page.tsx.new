@@ -1,0 +1,475 @@
+'use client';
+
+import { useAuth } from '@/context/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Link from 'next/link';
+import { useState } from 'react';
+import { 
+  BriefcaseIcon, 
+  UsersIcon, 
+  DocumentCheckIcon, 
+  ClockIcon,
+  ArrowUpRightIcon,
+  ArrowDownRightIcon,
+  BellIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  HomeIcon,
+  PlusIcon,
+  ChartBarIcon,
+  CogIcon,
+  CreditCardIcon,
+  QuestionMarkCircleIcon,
+  EnvelopeIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  CurrencyDollarIcon,
+  StarIcon
+} from '@heroicons/react/24/outline';
+
+const stats = [
+  { 
+    id: 1, 
+    name: 'Active Jobs', 
+    value: '3', 
+    icon: BriefcaseIcon, 
+    change: '+2.5%', 
+    changeType: 'increase', 
+    link: '/employer/my-jobs',
+    color: 'bg-blue-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-600'
+  },
+  { 
+    id: 2, 
+    name: 'New Applications', 
+    value: '12', 
+    icon: DocumentCheckIcon, 
+    change: '+30.1%', 
+    changeType: 'increase', 
+    link: '/employer/my-jobs',
+    color: 'bg-green-500',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-600'
+  },
+  { 
+    id: 3, 
+    name: 'Shortlisted', 
+    value: '5', 
+    icon: UsersIcon, 
+    change: '+1.8%', 
+    changeType: 'increase', 
+    link: '/employer/my-jobs',
+    color: 'bg-purple-500',
+    bgColor: 'bg-purple-50',
+    textColor: 'text-purple-600'
+  },
+  { 
+    id: 4, 
+    name: 'Upcoming Interviews', 
+    value: '2', 
+    icon: CalendarIcon, 
+    change: '+0.5%', 
+    changeType: 'increase', 
+    link: '#',
+    color: 'bg-orange-500',
+    bgColor: 'bg-orange-50',
+    textColor: 'text-orange-600'
+  },
+];
+
+const recentActivity = [
+  { 
+    id: 1, 
+    type: 'application', 
+    description: 'Maria G. applied for Housekeeper position', 
+    time: '2h ago', 
+    read: false,
+    icon: DocumentCheckIcon,
+    color: 'bg-green-100 text-green-700'
+  },
+  { 
+    id: 2, 
+    type: 'message', 
+    description: 'New message from Sarah M.', 
+    time: '5h ago', 
+    read: true,
+    icon: EnvelopeIcon,
+    color: 'bg-blue-100 text-blue-700'
+  },
+  { 
+    id: 3, 
+    type: 'payment', 
+    description: 'Payment received for Premium Membership', 
+    time: '1d ago', 
+    read: true,
+    icon: CurrencyDollarIcon,
+    color: 'bg-yellow-100 text-yellow-700'
+  },
+  { 
+    id: 4, 
+    type: 'job', 
+    description: 'Your job post has been approved', 
+    time: '2d ago', 
+    read: true,
+    icon: CheckCircleIcon,
+    color: 'bg-purple-100 text-purple-700'
+  },
+];
+
+const upcomingTasks = [
+  {
+    id: 1,
+    title: 'Interview with Sarah M.',
+    time: 'Tomorrow, 10:00 AM - 10:30 AM',
+    type: 'interview',
+    icon: CalendarIcon,
+    color: 'bg-blue-100 text-blue-600'
+  },
+  {
+    id: 2,
+    title: 'Review new applications',
+    time: '5 new applications to review',
+    type: 'review',
+    icon: DocumentCheckIcon,
+    color: 'bg-purple-100 text-purple-600'
+  },
+  {
+    id: 3,
+    title: 'Team meeting',
+    time: 'Friday, 11:00 AM',
+    type: 'meeting',
+    icon: UsersIcon,
+    color: 'bg-green-100 text-green-600'
+  }
+];
+
+const quickStats = [
+  {
+    name: 'Profile Completion',
+    value: '85%',
+    progress: 85,
+    color: 'from-blue-600 to-indigo-500'
+  },
+  {
+    name: 'Active Job Posts',
+    value: '3/5',
+    progress: 60,
+    color: 'from-green-600 to-emerald-500'
+  },
+  {
+    name: 'Response Rate',
+    value: '92%',
+    progress: 92,
+    color: 'from-purple-600 to-fuchsia-500'
+  }
+];
+
+const navigation = [
+  { name: 'Dashboard', href: '/employer/dashboard', icon: HomeIcon, current: true },
+  { name: 'Post Job', href: '/employer/post-job', icon: PlusIcon, current: false },
+  { name: 'My Jobs', href: '/employer/my-jobs', icon: BriefcaseIcon, current: false },
+  { name: 'Browse Workers', href: '/employer/browse-workers', icon: UserGroupIcon, current: false },
+  { name: 'Analytics', href: '/employer/stats', icon: ChartBarIcon, current: false },
+  { name: 'Payments', href: '/employer/payments', icon: CreditCardIcon, current: false },
+  { name: 'Settings', href: '/employer/settings', icon: CogIcon, current: false },
+  { name: 'Help', href: '/employer/help', icon: QuestionMarkCircleIcon, current: false },
+];
+
+export default function EmployerDashboard() {
+  const { user, signOut } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <ProtectedRoute allowedRoles={['employer']}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-40 md:hidden">
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+          </div>
+        )}
+
+        {/* Sidebar */}
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">CM</span>
+                </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  CityMaid
+                </h1>
+              </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    item.current
+                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-transparent'
+                  }`}
+                >
+                  <item.icon className={`mr-3 h-5 w-5 ${
+                    item.current ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
+                  }`} />
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+
+            {/* User section */}
+            <div className="border-t border-gray-200 p-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                  <span className="text-white font-semibold">
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.email?.split('@')[0] || 'Employer'}
+                  </p>
+                  <p className="text-xs text-gray-500">Employer</p>
+                </div>
+                <button
+                  onClick={signOut}
+                  className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="md:ml-64 flex flex-col">
+          {/* Top bar */}
+          <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200">
+            <div className="flex items-center justify-between h-16 px-6">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+                <h1 className="ml-4 md:ml-0 text-2xl font-bold text-gray-900">Dashboard</h1>
+              </div>
+              <div className="flex items-center space-x-4">
+                <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg relative">
+                  <BellIcon className="h-6 w-6" />
+                  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Page content */}
+          <div className="flex-1 p-6">
+            {/* Welcome section */}
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-900">
+                Welcome back, {user?.email?.split('@')[0] || 'Employer'}! 👋
+              </h2>
+              <p className="mt-2 text-gray-600">
+                Here's what's happening with your job postings and applications today.
+              </p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+              {stats.map((stat) => (
+                <Link key={stat.id} href={stat.link} className="group">
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 group-hover:scale-105">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+                        <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                      </div>
+                      <div className={`p-3 rounded-xl ${stat.bgColor}`}>
+                        <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        stat.changeType === 'increase' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {stat.changeType === 'increase' ? (
+                          <ArrowUpRightIcon className="-ml-0.5 mr-1 h-3 w-3" />
+                        ) : (
+                          <ArrowDownRightIcon className="-ml-0.5 mr-1 h-3 w-3" />
+                        )}
+                        {stat.change}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Main content grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Recent Activity */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                      <Link href="/employer/notifications" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                        View all
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flow-root">
+                      <ul className="-mb-8">
+                        {recentActivity.map((activity, activityIdx) => (
+                          <li key={activity.id}>
+                            <div className="relative pb-8">
+                              {activityIdx !== recentActivity.length - 1 && (
+                                <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
+                              )}
+                              <div className="relative flex space-x-3">
+                                <div>
+                                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${activity.color}`}>
+                                    <activity.icon className="h-4 w-4" />
+                                  </span>
+                                </div>
+                                <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                  <div>
+                                    <p className="text-sm text-gray-900">{activity.description}</p>
+                                  </div>
+                                  <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                                    <time dateTime={activity.time}>{activity.time}</time>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right sidebar */}
+              <div className="space-y-6">
+                {/* Upcoming Tasks */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Upcoming Tasks</h3>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {upcomingTasks.map((task) => (
+                        <div key={task.id} className="flex items-start space-x-3">
+                          <div className={`p-2 rounded-lg ${task.color}`}>
+                            <task.icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900">{task.title}</p>
+                            <p className="text-sm text-gray-500">{task.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <Link
+                        href="#"
+                        className="w-full flex justify-center items-center px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        View all tasks
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-6">
+                      {quickStats.map((stat, index) => (
+                        <div key={index}>
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-gray-900">{stat.name}</p>
+                            <p className="text-sm font-semibold text-gray-900">{stat.value}</p>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                            <div className={`bg-gradient-to-r ${stat.color} h-2 transition-all duration-500`} style={{ width: `${stat.progress}%` }}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-3">
+                      <Link
+                        href="/employer/post-job"
+                        className="flex items-center p-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                      >
+                        <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                          <PlusIcon className="h-4 w-4" />
+                        </div>
+                        <span className="ml-3 text-sm font-medium text-gray-900">Post a New Job</span>
+                      </Link>
+                      <Link
+                        href="/employer/browse-workers"
+                        className="flex items-center p-3 rounded-xl border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all duration-200"
+                      >
+                        <div className="p-2 rounded-lg bg-green-100 text-green-600">
+                          <UserGroupIcon className="h-4 w-4" />
+                        </div>
+                        <span className="ml-3 text-sm font-medium text-gray-900">Browse Workers</span>
+                      </Link>
+                      <Link
+                        href="/employer/my-jobs"
+                        className="flex items-center p-3 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-200"
+                      >
+                        <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                          <DocumentCheckIcon className="h-4 w-4" />
+                        </div>
+                        <span className="ml-3 text-sm font-medium text-gray-900">View Applications</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}
