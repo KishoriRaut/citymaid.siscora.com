@@ -40,6 +40,12 @@ export default function Header() {
             >
               Browse Jobs
             </Link>
+            <Link 
+              href="/how-it-works" 
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium"
+            >
+              How It Works
+            </Link>
             
             {/* Show dashboard for logged-in users */}
             {user && (
@@ -173,6 +179,13 @@ export default function Header() {
               </>
             ) : (
               <div className="space-y-1 px-2">
+                <Link 
+                  href="/how-it-works" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How It Works
+                </Link>
                 <Link 
                   href="/auth/signin" 
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
