@@ -9,15 +9,36 @@ DECLARE
   user_full_name TEXT;
   user_role TEXT;
 BEGIN
+<<<<<<< HEAD
   -- Safely extract full_name from raw_user_meta_data
   BEGIN
     user_full_name := NEW.raw_user_meta_data->>'full_name';
   EXCEPTION WHEN OTHERS THEN
     user_full_name := NULL;
+=======
+  -- Safely extract data from raw_user_meta_data
+  BEGIN
+    user_full_name := NEW.raw_user_meta_data->>'full_name';
+    -- Try to get role from raw_user_meta_data first
+    user_role := NEW.raw_user_meta_data->>'role';
+    
+    -- If role is not in raw_user_meta_data, try to get it from the user's metadata
+    IF user_role IS NULL THEN
+      user_role := (NEW.raw_user_meta_data->>'role')::TEXT;
+    END IF;
+    
+  EXCEPTION WHEN OTHERS THEN
+    user_full_name := NULL;
+    user_role := NULL;
+>>>>>>> work-aug22
   END;
 
   -- Set default role if not provided
   user_role := COALESCE(
+<<<<<<< HEAD
+=======
+    user_role,
+>>>>>>> work-aug22
     (SELECT role FROM public.profiles WHERE id = NEW.id),
     'employer'::TEXT
   );

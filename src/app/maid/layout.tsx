@@ -1,7 +1,15 @@
 import { ReactNode } from 'react';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 
+<<<<<<< HEAD
 export default function MaidLayout({ children }: { children: ReactNode }) {
+=======
+export default function MaidLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+>>>>>>> work-aug22
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar role="maid" />
@@ -9,5 +17,12 @@ export default function MaidLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
     </div>
+<<<<<<< HEAD
   );
 }
+=======
+  )
+}
+// src/app/maid/layout.tsx
+<Sidebar userRole="maid" />
+>>>>>>> work-aug22

@@ -43,19 +43,33 @@ export default function SignUpPage() {
     setError('');
     
     try {
+<<<<<<< HEAD
       localStorage.setItem('signup_role', role);
+=======
+      // Store the role in localStorage for the callback
+      localStorage.setItem('signup_role', role);
+      
+      // Call the signup function
+>>>>>>> work-aug22
       const result = await signUpWithEmail(email, password, fullName);
       
       if (!result) {
         throw new Error('No response from server');
       }
       
+<<<<<<< HEAD
       if (result.session) {
         // Successfully signed up and got a session
         router.push(role === 'maid' ? '/maid/dashboard' : '/employer/dashboard');
       } else {
         // Email confirmation required
         setError('Please check your email to verify your account');
+=======
+      // The AuthContext will handle the redirection if there's a session
+      if (!result.session) {
+        // If no session, it means email confirmation is required
+        setError('Please check your email to verify your account. You will be redirected after verification.');
+>>>>>>> work-aug22
       }
     } catch (err: any) {
       console.error('Signup error:', err);
@@ -93,7 +107,11 @@ export default function SignUpPage() {
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 }`}
               >
+<<<<<<< HEAD
                 Hire Help
+=======
+                I am an Employer
+>>>>>>> work-aug22
               </button>
               <button
                 type="button"
@@ -104,7 +122,11 @@ export default function SignUpPage() {
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 }`}
               >
+<<<<<<< HEAD
                 Find Work
+=======
+                I am a Maid
+>>>>>>> work-aug22
               </button>
             </div>
           </div>
