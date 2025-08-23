@@ -1,9 +1,5 @@
 import type { NextConfig } from "next";
 
-<<<<<<< HEAD
-const nextConfig: NextConfig = {
-  /* config options here */
-=======
 // Validate required environment variables
 const requiredEnvVars = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -26,7 +22,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
   // Other Next.js config options can be added here
->>>>>>> work-aug22
 };
 
 export default nextConfig;

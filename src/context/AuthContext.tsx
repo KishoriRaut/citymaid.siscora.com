@@ -10,13 +10,8 @@ interface AuthContextType {
   user: any;
   role: UserRole;
   signInWithGoogle: () => Promise<void>;
-<<<<<<< HEAD
-  signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ user: any; session: any } | undefined>;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
-=======
   signUpWithEmail: (email: string, password: string, fullName: string, role: 'employer' | 'maid') => Promise<{ user: any; session: any } | undefined>;
   signInWithEmail: (email: string, password: string) => Promise<{ user: any; session: any } | undefined>;
->>>>>>> work-aug22
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -50,27 +45,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (session?.user) {
           setUser(session.user);
           
-<<<<<<< HEAD
-          // First, try to get the user's role
-          try {
-            // Try to fetch the profile
-            const { data, error } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', session.user.id)
-              .single();
-
-            if (error) {
-              console.log('Profile fetch error, defaulting role to employer (suppressing background creation in dev)...');
-              // In dev, avoid background table RPC and insert attempts to prevent 404/401 noise
-              setRole('employer');
-            } else {
-              // If we got the profile, set the role
-              setRole(data?.role || 'employer');
-            }
-          } catch (err) {
-            console.error('Error in profile handling:', err);
-=======
           try {
             // Try to get the user's role with better error handling
             let profile = null;
@@ -101,8 +75,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                   .from('profiles')
                   .upsert({
                     id: session.user.id,
-                    email: session.user.email,
-                    full_name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+                    email: session.user.email || '',
+                    full_name: session.user.user_metadata?.full_name || (session.user.email ? session.user.email.split('@')[0] : 'User'),
                     role: 'employer',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
@@ -111,7 +85,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 if (createError) {
                   console.error('Failed to create profile:', createError);
                   // Try a direct insert if upsert fails
-                  const { error: insertError } = await supabase.rpc('create_profile_for_user', {
+                  if (!session.user.email) {
+                  throw new Error('User email is required');
+                }
+                const { error: insertError } = await supabase.rpc('create_profile_for_user', {
                     user_id: session.user.id,
                     user_email: session.user.email,
                     user_role: 'employer',
@@ -137,7 +114,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           } catch (error) {
             console.error('Error in profile handling:', error);
->>>>>>> work-aug22
             // Default to employer role if anything goes wrong
             setRole('employer');
           }
@@ -189,8 +165,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signInWithGoogle = async () => {
     try {
-<<<<<<< HEAD
-=======
       // Get role from localStorage or default to 'employer'
       const storedRole = localStorage.getItem('signup_role');
       console.log('Google sign-in - Stored role:', storedRole);
@@ -208,7 +182,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Include role in both state and queryParams for redundancy
       const state = `role_${validRole}`;
       
->>>>>>> work-aug22
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -216,12 +189,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-<<<<<<< HEAD
-          },
-        },
-      });
-      if (error) throw error;
-=======
             state: state,
             role: validRole // Add role as a query parameter too
           },
@@ -232,20 +199,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Google OAuth error:', error);
         throw error;
       }
->>>>>>> work-aug22
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error; // Re-throw to handle in the component
     }
   };
 
-<<<<<<< HEAD
-  const signUpWithEmail = async (email: string, password: string, fullName: string) => {
-    try {
-      const role = localStorage.getItem('signup_role') as UserRole || 'employer';
-      
-      // 1. Sign up the user with email and password
-=======
   const signUpWithEmail = async (email: string, password: string, fullName: string, role: 'employer' | 'maid') => {
     try {
       // Validate the role
@@ -258,31 +217,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Store the role in sessionStorage as a fallback
       sessionStorage.setItem('temp_role', role);
       
-      // 1. First, create the user with minimal data
->>>>>>> work-aug22
+      // 1. Create the user with Supabase Auth
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
-<<<<<<< HEAD
-            email: email,
-=======
             role: role
->>>>>>> work-aug22
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-<<<<<<< HEAD
-
-      if (signUpError) throw signUpError;
-      if (!authData?.user) throw new Error('No user data returned from sign up');
-
-      // 2. Use the service role client to bypass RLS for profile creation
-      const { data: profileData, error: profileError } = await supabase
-=======
       
       console.log('Auth signup response:', { authData, signUpError });
       
@@ -306,7 +252,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // 3. Update the profile directly as a fallback
       console.log('Updating profile directly for user:', authData.user.id);
       const { error: profileError } = await supabase
->>>>>>> work-aug22
         .from('profiles')
         .upsert({
           id: authData.user.id,
@@ -315,40 +260,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           role: role,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-<<<<<<< HEAD
-        })
-        .select()
-        .single();
-
-      if (profileError) {
-        console.error('Profile update error:', profileError);
-        throw new Error(`Failed to create profile: ${profileError.message}`);
-      }
-
-      // 3. Update local state
-      setUser(authData.user);
-      setRole(role);
-      
-      // 4. Force refresh the session to ensure it's up to date
-      const { data: { session }, error: sessionError } = await supabase.auth.refreshSession();
-      
-      if (sessionError) {
-        console.error('Error refreshing session:', sessionError);
-        throw sessionError;
-      }
-      
-      return { 
-        user: { 
-          ...authData.user, 
-          role: profileData?.role || role 
-        }, 
-        session 
-      };
-    } catch (error) {
-      console.error('Error signing up with email:', error);
-      throw error;
-    }
-=======
         });
         
       if (profileError) {
@@ -382,21 +293,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error in signUpWithEmail:', error);
       throw error;
     }
-    
->>>>>>> work-aug22
   };
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
-<<<<<<< HEAD
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error signing in with email:', error);
-=======
       // First sign in the user
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -433,7 +333,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return data;
     } catch (error: any) {
       console.error('Error signing in:', error);
->>>>>>> work-aug22
       throw error;
     }
   };
@@ -441,18 +340,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-<<<<<<< HEAD
-      router.push('/login');
-    } catch (error) {
-      console.error('Error signing out:', error);
-=======
       setUser(null);
       setRole(null);
       router.push('/login');
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
->>>>>>> work-aug22
     }
   };
 

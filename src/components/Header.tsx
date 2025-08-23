@@ -40,15 +40,12 @@ export default function Header() {
             >
               Browse Jobs
             </Link>
-<<<<<<< HEAD
-=======
             <Link 
               href="/how-it-works" 
               className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium"
             >
               How It Works
             </Link>
->>>>>>> work-aug22
             
             {/* Show dashboard for logged-in users */}
             {user && (
@@ -114,21 +111,13 @@ export default function Header() {
               // Show login/signup for guests
               <>
                 <Link 
-<<<<<<< HEAD
-                  href="/login" 
-=======
                   href="/auth/signin" 
->>>>>>> work-aug22
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium"
                 >
                   Sign In
                 </Link>
                 <Link
-<<<<<<< HEAD
-                  href="/signup"
-=======
                   href="/auth/signup"
->>>>>>> work-aug22
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Sign Up
@@ -191,9 +180,6 @@ export default function Header() {
             ) : (
               <div className="space-y-1 px-2">
                 <Link 
-<<<<<<< HEAD
-                  href="/login" 
-=======
                   href="/how-it-works" 
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
@@ -202,18 +188,13 @@ export default function Header() {
                 </Link>
                 <Link 
                   href="/auth/signin" 
->>>>>>> work-aug22
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign In
                 </Link>
                 <Link 
-<<<<<<< HEAD
-                  href="/signup" 
-=======
-                  href="/auth/signup" 
->>>>>>> work-aug22
+                  href="/auth/signup"
                   className="block w-full text-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
                   onClick={() => setIsMenuOpen(false)}
                 >
